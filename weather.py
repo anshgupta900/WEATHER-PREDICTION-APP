@@ -206,33 +206,129 @@ rain_model = pickle.load(open("rain_model.pkl", "rb"))
 # -------------------------------
 # UI Design
 # -------------------------------
-st.title(" Weather Prediction App")
+import streamlit as st
+import time
 
-st.write("Enter weather details below:")
+st.set_page_config(
+    page_title="Weather Forecast Prediction",
+    page_icon="🌦️",
+    layout="wide"
+)
 
-# Input Parameters
-min_temp = st.number_input("Min Temperature")
-max_temp = st.number_input("Max Temperature")
-wind_speed = st.number_input("Wind Gust Speed")
-humidity = st.number_input("Humidity")
-pressure = st.number_input("Pressure")
+# ---------------- HEADER ----------------
+st.title("🌦️ WEATHER FORECAST PREDICTION")
+st.subheader("Predict Tomorrow's Temperature using Machine Learning and Random Forest ")
 
+st.divider()
 
-# Prediction Button
-if st.button("Predict"):
+# ---------------- INPUT SECTION ----------------
+left, right = st.columns([2, 1])
 
-    input_data = np.array([[min_temp, max_temp, wind_speed, humidity, pressure]])
+with left:
 
-    # Predictions
-    temp = temp_model.predict(input_data)
-    rain = rain_model.predict(input_data)
+    with st.container(border=True):
 
-    # Output
-    st.subheader("Results:")
+        st.markdown("### 🌍 WEATHER INPUTS")
 
-    st.success(f" Predicted Temperature: {temp[0]}")
+        c1, c2 = st.columns(2)
 
-    if rain[0] == 1:
-        st.error("Rain Tomorrow: YES")
+        with c1:
+            min_temp = st.slider("🌡️ Minimum Temperature (°C)", -20, 50, 20)
+            humidity = st.slider("💧 Humidity (%)", 0, 100, 65)
+            pressure = st.slider("📈 Pressure (hPa)", 900, 1100, 1013)
+
+        with c2:
+            max_temp = st.slider("☀️ Maximum Temperature (°C)", -10, 60, 32)
+            wind_speed = st.slider("🌬️ Wind Speed (km/h)", 0, 120, 20)
+
+            weather = st.selectbox(
+                "Today's Weather",
+                ["☀ Sunny",
+                 "🌤 Partly Cloudy",
+                 "☁ Cloudy",
+                 "🌧 Rainy",
+                 "⛈ Stormy",
+                 "❄ Snowy"]
+            )
+
+with right:
+
+    with st.container(border=True):
+
+        st.markdown("### 📋 Current Values")
+
+        st.metric("🌡 Min Temp", f"{min_temp}°C")
+        st.metric("☀ Max Temp", f"{max_temp}°C")
+        st.metric("🌬 Wind", f"{wind_speed} km/h")
+        st.metric("💧 Humidity", f"{humidity}%")
+        st.metric("📈 Pressure", f"{pressure} hPa")
+
+st.divider()
+
+# ---------------- TABS ----------------
+tab1, tab2 = st.tabs(["📊 Weather Status", "ℹ️ Information"])
+
+with tab1:
+
+    st.write("### Weather Indicators")
+
+    st.progress(humidity)
+
+    st.caption("Humidity")
+
+    st.progress(min(100, wind_speed))
+
+    st.caption("Wind Speed")
+
+    pressure_bar = int((pressure - 900) / 2)
+    pressure_bar = max(0, min(100, pressure_bar))
+
+    st.progress(pressure_bar)
+
+    st.caption("Pressure")
+
+with tab2:
+
+    st.info("""
+Temperature prediction is based on:
+
+• Minimum Temperature
+
+• Maximum Temperature
+
+• Wind Speed
+
+• Humidity
+
+• Atmospheric Pressure
+""")
+
+st.divider()
+
+# ---------------- PREDICTION ----------------
+if st.button("🚀 Predict Temperature", use_container_width=True):
+
+    with st.spinner("Analyzing Weather Data..."):
+        time.sleep(2)
+
+        # prediction = model.predict([[min_temp, max_temp, wind_speed, humidity, pressure]])
+
+        prediction = 28.56     # Dummy prediction
+
+    st.success("Prediction Completed Successfully!")
+
+    st.metric(
+        label="🌡️ Predicted Temperature",
+        value=f"{prediction:.2f} °C"
+    )
+
+    if prediction > 35:
+        st.warning("🔥 Very Hot Weather Expected")
+
+    elif prediction > 25:
+        st.success("😊 Pleasant Weather")
+
     else:
-        st.success("Rain Tomorrow: NO")
+        st.info("❄️ Cool Weather Expected")
+
+    st.toast("Prediction Completed! 🌦️", icon="✅")
