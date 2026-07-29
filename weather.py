@@ -313,7 +313,8 @@ if st.button("🚀 Predict Temperature", use_container_width=True):
 
         # prediction = model.predict([[min_temp, max_temp, wind_speed, humidity, pressure]])
 
-        prediction = 28.56     # Dummy prediction
+        prediction = temp_model.predict(
+        [[min_temp, max_temp, wind_speed, humidity, pressure]])[0]
 
     st.success("Prediction Completed Successfully!")
 
