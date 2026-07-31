@@ -332,4 +332,3 @@ if st.button("🚀 Predict Temperature", use_container_width=True):
     else:
         st.info("❄️ Cool Weather Expected")
 
-    st.balloons()
